@@ -158,7 +158,6 @@ lfocomp/
 ├── lfo-comp.js     Public API: createLFO(), connect(), disconnect()
 ├── demo.html       Interactive demo — open after npm run serve
 ├── tests/          Unit tests (vitest, jsdom)
-└── specs/          Spec docs for planned features
 ```
 
 The three files are fully independent of each other except in one direction: `lfo-ui.js` imports from `lfo-engine.js`, and `lfo-comp.js` imports from both. Nothing imports from the outside.

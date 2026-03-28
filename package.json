@@ -9,19 +9,19 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "types":   "./types/lfo-comp.d.ts",
+      "types": "./types/lfo-comp.d.ts",
       "default": "./lfo-comp.js"
     },
     "./engine": {
-      "types":   "./types/lfo-engine.d.ts",
+      "types": "./types/lfo-engine.d.ts",
       "default": "./lfo-engine.js"
     },
     "./ui": {
-      "types":   "./types/lfo-ui.d.ts",
+      "types": "./types/lfo-ui.d.ts",
       "default": "./lfo-ui.js"
     },
     "./bundle": {
-      "types":   "./types/lfo.d.ts",
+      "types": "./types/lfo.d.ts",
       "default": "./lfo.js"
     }
   },
@@ -34,14 +34,14 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build:types":  "tsc -p tsconfig.json && tsc -p tsconfig.bundle.json",
+    "build:types": "tsc -p tsconfig.json && tsc -p tsconfig.bundle.json",
     "build:bundle": "rollup lfo-comp.js --file lfo.js --format es",
-    "build":        "npm run build:bundle && npm run build:types",
+    "build": "npm run build:bundle && npm run build:types",
     "prepublishOnly": "npm run build",
-    "test":         "vitest run",
-    "test:watch":   "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "serve":        "python3 -m http.server 8080"
+    "serve": "python3 -m http.server 8080"
   },
   "keywords": [
     "lfo",
@@ -57,13 +57,14 @@
   "homepage": "https://kush42.github.io/lfo.html",
   "repository": {
     "type": "git",
-    "url":  "git+https://github.com/KUSH42/lfocomp.git"
+    "url": "git+https://github.com/KUSH42/lfocomp.git"
   },
   "bugs": {
     "url": "https://github.com/KUSH42/lfocomp/issues"
   },
   "license": "MIT",
   "devDependencies": {
+    "playwright": "^1.58.2",
     "rollup": "^4.60.0",
     "typescript": "^6.0.2",
     "vitest": "^3.0.0"
