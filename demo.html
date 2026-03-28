@@ -211,7 +211,13 @@
     #route-table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
+
+    #route-table colgroup col:nth-child(1) { width: 80px; }
+    #route-table colgroup col:nth-child(2) { width: auto; }
+    #route-table colgroup col:nth-child(3) { width: 100px; }
+    #route-table colgroup col:nth-child(4) { width: 26px; }
 
     #route-table th {
       font-size: 9px;
@@ -223,24 +229,54 @@
       border-bottom: 1px solid var(--border);
     }
 
+    #route-table th:last-child {
+      text-align: center;
+      padding: 4px 0;
+    }
+
     #route-table td {
       padding: 5px 8px;
       font-size: 11px;
       border-bottom: 1px solid #11111c;
       vertical-align: middle;
+      overflow: hidden;
+    }
+
+    #route-table td:last-child {
+      padding: 5px 0;
+      text-align: center;
     }
 
     #route-table tr:last-child td {
       border-bottom: none;
     }
 
+    .route-src-cell {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
     .route-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      display: inline-block;
-      margin-right: 5px;
       flex-shrink: 0;
+    }
+
+    .route-src-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .route-tgt-cell {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #777;
     }
 
     .route-none {
@@ -254,7 +290,7 @@
     .route-depth-cell {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .route-depth-slider {
@@ -280,7 +316,7 @@
     }
 
     .route-depth-val {
-      width: 28px;
+      width: 30px;
       text-align: right;
       color: #777;
       font-size: 10px;
@@ -294,9 +330,10 @@
       cursor: pointer;
       font-size: 14px;
       line-height: 1;
-      padding: 0 2px;
-      opacity: 0.6;
+      padding: 0;
+      opacity: 0.5;
       transition: opacity 0.1s;
+      width: 100%;
     }
 
     .route-del-btn:hover { opacity: 1; }
@@ -433,11 +470,15 @@
       <div class="matrix-section">
         <div class="section-label">Modulation Matrix</div>
         <table id="route-table">
+          <colgroup>
+            <col><col><col><col>
+          </colgroup>
           <thead>
             <tr>
               <th>Source</th>
               <th>Target</th>
-              <th colspan="2">Depth</th>
+              <th>Depth</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="route-tbody">
@@ -592,17 +633,25 @@ function buildMatrixRow(r) {
 
   // Source
   const tdSrc = document.createElement('td');
-  tdSrc.innerHTML =
-    `<span class="route-dot" style="background:${color}"></span>${srcName}`;
+  const srcCell = document.createElement('div');
+  srcCell.className = 'route-src-cell';
+  const dot = document.createElement('span');
+  dot.className = 'route-dot';
+  dot.style.background = color;
+  const srcName_ = document.createElement('span');
+  srcName_.className = 'route-src-name';
+  srcName_.textContent = srcName;
+  srcCell.appendChild(dot);
+  srcCell.appendChild(srcName_);
+  tdSrc.appendChild(srcCell);
 
   // Target
   const tdTgt = document.createElement('td');
-  tdTgt.style.color = '#777';
+  tdTgt.className = 'route-tgt-cell';
   tdTgt.innerHTML = getTargetName(r);
 
   // Depth slider + value
   const tdDepth = document.createElement('td');
-  tdDepth.style.width = '110px';
   const depthCell = document.createElement('div');
   depthCell.className = 'route-depth-cell';
 
@@ -633,7 +682,6 @@ function buildMatrixRow(r) {
 
   // Delete button
   const tdDel = document.createElement('td');
-  tdDel.style.width = '20px';
   const btn = document.createElement('button');
   btn.className   = 'route-del-btn';
   btn.textContent = '×';
