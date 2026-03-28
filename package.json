@@ -1,6 +1,6 @@
 {
   "name": "lfocomp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ableton-style LFO modulation component — wire LFOs to any HTML input by drag-and-drop",
   "type": "module",
   "main": "./lfo-comp.js",
