@@ -7,7 +7,7 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
 [![ES modules](https://img.shields.io/badge/module-ESM-f7df1e.svg)]()
-[![npm](https://img.shields.io/badge/npm-not%20yet%20published-lightgrey.svg)]()
+[![npm](https://img.shields.io/npm/v/lfocomp.svg)](https://www.npmjs.com/package/lfocomp)
 
 **[Live demo](https://kush42.github.io/lfo.html)**
 
