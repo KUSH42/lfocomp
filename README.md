@@ -35,7 +35,7 @@ lfocomp is one import, three files, and you're live.
 
 ## Install
 
-### npm *(coming soon)*
+### npm
 ```bash
 npm install lfocomp
 ```
