@@ -5,19 +5,41 @@
  *
  * Requires: npx playwright, ffmpeg
  * Server must be running on http://localhost:8081
+ *
+ * Captures only the LFO panel (header + 3 widgets), excluding the
+ * modulation matrix, live preview box, and target sliders below.
  */
 
 import { chromium } from 'playwright';
 import { execSync } from 'child_process';
 import { mkdirSync } from 'fs';
 
-const WIDTH  = 900;
-const HEIGHT = 600;
+const WIDTH = 900;
 const VIDEO_DIR = '/tmp/lfocomp-recording';
 
 mkdirSync(VIDEO_DIR, { recursive: true });
 mkdirSync('docs', { recursive: true });
 
+// ── Pass 1: measure the LFO panel height at target width ──────────────────
+const probe = await chromium.launch({ headless: true });
+const probePage = await probe.newPage();
+await probePage.setViewportSize({ width: WIDTH, height: 900 });
+await probePage.goto('http://localhost:8081/demo.html', { waitUntil: 'networkidle' });
+await probePage.waitForSelector('.lfo-connect-handle', { timeout: 10000 });
+
+const cropHeight = await probePage.evaluate(() => {
+  const section = document.querySelector('#lfo-container').closest('div');
+  const rect = section.getBoundingClientRect();
+  // bottom of the LFO section + a little breathing room
+  return Math.ceil(rect.bottom) + 24;
+});
+
+await probe.close();
+
+const HEIGHT = cropHeight;
+console.log(`Capturing ${WIDTH}×${HEIGHT} (LFO panel only)`);
+
+// ── Pass 2: record at the measured height ────────────────────────────────
 const browser = await chromium.launch({ headless: true });
 
 const ctx = await browser.newContext({
@@ -40,8 +62,8 @@ await page.waitForTimeout(1500);
 const handle = page.locator('.lfo-connect-handle').first();
 const sizeSlider = page.locator('#ctrl-size');
 
-const handleBox  = await handle.boundingBox();
-const sliderBox  = await sizeSlider.boundingBox();
+const handleBox = await handle.boundingBox();
+const sliderBox = await sizeSlider.boundingBox();
 
 const startX = handleBox.x + handleBox.width  / 2;
 const startY = handleBox.y + handleBox.height / 2;
@@ -64,8 +86,8 @@ await page.mouse.up();
 await page.waitForTimeout(3000);
 
 // ── Drag LFO 2 onto Rotation slider ───────────────────────────────────────
-const handle2      = page.locator('.lfo-connect-handle').nth(1);
-const rotSlider    = page.locator('#ctrl-rotation');
+const handle2   = page.locator('.lfo-connect-handle').nth(1);
+const rotSlider = page.locator('#ctrl-rotation');
 
 const h2Box  = await handle2.boundingBox();
 const rotBox = await rotSlider.boundingBox();
@@ -84,19 +106,16 @@ await page.mouse.up();
 // Watch both modulations
 await page.waitForTimeout(3500);
 
-// Retrieve path before closing (finalises the recording)
 const videoPath = await page.video().path();
 await ctx.close();
 await browser.close();
 console.log('Video:', videoPath);
 
 // ── Convert to GIF via ffmpeg ──────────────────────────────────────────────
-// 1. Generate palette for high-quality GIF
 execSync(
-  `ffmpeg -y -i "${videoPath}" -vf "fps=20,scale=800:-1:flags=lanczos,palettegen" /tmp/lfocomp-palette.png`,
+  `ffmpeg -y -i "${videoPath}" -vf "fps=20,scale=800:-1:flags=lanczos,palettegen" -update 1 /tmp/lfocomp-palette.png`,
   { stdio: 'inherit' }
 );
-// 2. Apply palette
 execSync(
   `ffmpeg -y -i "${videoPath}" -i /tmp/lfocomp-palette.png ` +
   `-filter_complex "fps=20,scale=800:-1:flags=lanczos[x];[x][1:v]paletteuse" docs/demo.gif`,
