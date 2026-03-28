@@ -8,6 +8,7 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
 [![ES modules](https://img.shields.io/badge/module-ESM-f7df1e.svg)]()
+[![npm](https://img.shields.io/badge/npm-not%20yet%20published-lightgrey.svg)]()
 
 ---
 
@@ -31,10 +32,33 @@ lfocomp is one import, three files, and you're live.
 
 ---
 
+## Install
+
+### npm *(coming soon)*
+```bash
+npm install lfocomp
+```
+```js
+import { createLFO } from 'lfocomp';
+```
+
+### CDN (no install)
+```html
+<script type="module">
+  import { createLFO } from 'https://cdn.jsdelivr.net/npm/lfocomp/lfo-comp.js';
+</script>
+```
+
+### Self-hosted
+Download `lfo-comp.js`, `lfo-engine.js`, and `lfo-ui.js` into the same directory.
+No build step required.
+
+---
+
 ## Quick start
 
 ```bash
-git clone https://github.com/yourname/lfocomp
+git clone https://github.com/KUSH42/lfocomp
 cd lfocomp
 npm run serve        # python3 -m http.server 8080
 # open http://localhost:8080/demo.html
