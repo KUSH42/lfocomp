@@ -170,7 +170,7 @@ npm test            # vitest run
 npm run test:watch  # watch mode
 ```
 
-Tests cover engine math and route management. DOM-dependent behaviour (drag, canvas) is not tested — use the demo.
+91 tests across three files: `engine.test.js` (math, tick loop, route graph), `widget.test.js` (LFOWidget lifecycle, drag cancel, ModIndicator, stale-route pruning), and `comp.test.js` (public API factory, color cycling, connect/disconnect helpers).
 
 ---
 

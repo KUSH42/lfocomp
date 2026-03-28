@@ -234,6 +234,24 @@ describe('LFOEngine.destroyLFO', () => {
     eng.destroyLFO(id1);
     expect(eng._running).toBe(true);
   });
+
+  it('removes incoming chain routes when the target LFO is destroyed (M2)', () => {
+    const src  = eng.createLFO({ rate: 1 });
+    const tgt  = eng.createLFO({ rate: 2 });
+    const routeId = eng.addRoute(src, 'lfo', tgt, 'rate', { depth: 0.5 });
+    expect(eng.getRoute(routeId)).toBeDefined();
+    // Destroy the TARGET LFO — the incoming chain route must also be removed.
+    eng.destroyLFO(tgt);
+    expect(eng.getRoute(routeId)).toBeUndefined();
+  });
+
+  it('still removes outgoing chain routes when destroying the source (regression guard)', () => {
+    const src = eng.createLFO({ rate: 1 });
+    const tgt = eng.createLFO({ rate: 2 });
+    const routeId = eng.addRoute(src, 'lfo', tgt, 'rate', { depth: 0.5 });
+    eng.destroyLFO(src);
+    expect(eng.getRoute(routeId)).toBeUndefined();
+  });
 });
 
 describe('LFOEngine.setParam / getParam', () => {
