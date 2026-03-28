@@ -21,4 +21,4 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add lfo.html lfo-engine.js lfo-ui.js lfo-comp.js
-          git diff --cached --quiet && echo "No changes" || git commit -m "sync lfocomp demo" && git push
+          git diff --cached --quiet || (git commit -m "sync lfocomp demo" && git push)
