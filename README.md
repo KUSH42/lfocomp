@@ -10,6 +10,8 @@
 [![ES modules](https://img.shields.io/badge/module-ESM-f7df1e.svg)]()
 [![npm](https://img.shields.io/badge/npm-not%20yet%20published-lightgrey.svg)]()
 
+**[Live demo](https://kush42.github.io/lfo.html)**
+
 ---
 
 ## What it is
@@ -84,7 +86,8 @@ widget.connect(document.querySelector('#my-slider'), { depth: 0.7 });
 - **Waveform skew** — warps the phase midpoint, turning a sine into something between a shark fin and a reverse ramp
 - **Modulation matrix** — live table of all active routes with adjustable depth sliders and one-click delete
 - **ModIndicator badges** — floating badges anchored to each connected input with drag-to-adjust depth and a range arc showing the sweep zone
-- **Bipolar / unipolar** output modes
+- **Bipolar / unipolar toggle** — BI/UNI button on the widget switches output between ±1 and 0–1
+- **Click-to-type param values** — click any value readout to type an exact number; Enter commits, Escape cancels
 
 ---
 
@@ -103,7 +106,7 @@ for (let i = 0; i < intShift; i++) {
 }
 ```
 
-The cursor advances at a fixed wall-clock rate (`W / 4` px/sec — always a 4-second window) regardless of LFO rate, so a 0.1 Hz LFO and a 20 Hz LFO both scroll at the same speed. Only the cycle density changes.
+The cursor advances at a fixed wall-clock rate (`W / 4` px/sec — always a 4-second window) regardless of LFO rate, so a 0.1 Hz LFO and a 10 Hz LFO both scroll at the same speed. Only the cycle density changes.
 
 The visible canvas is composited from an offscreen `willReadFrequently` buffer. Only `intShift` new columns are painted per frame via `getImageData`/`putImageData` — no full redraws at 60 fps.
 
@@ -114,13 +117,14 @@ The visible canvas is composited from an offscreen `willReadFrequently` buffer. 
 ```js
 // Create
 const { lfoId, widget } = createLFO(containerEl, {
-  shape:  'sine',   // 'sine'|'triangle'|'saw'|'rsaw'|'square'|'random'|'smooth'
-  rate:   1.0,      // Hz
-  depth:  1.0,      // 0–1
-  phase:  0.0,      // 0–1 (0.5 = 180° offset)
-  offset: 0.0,      // DC offset, -1–1
-  color:  '#00d4ff',
-  label:  'LFO 1',
+  shape:   'sine',   // 'sine'|'triangle'|'saw'|'rsaw'|'square'|'random'|'smooth'
+  rate:    1.0,      // Hz (0.01–10)
+  depth:   1.0,      // 0–1
+  phase:   0.0,      // 0–1 (0.5 = 180° offset)
+  offset:  0.0,      // DC offset, -1–1
+  bipolar: true,     // true = ±1 output, false = 0–1
+  color:   '#00d4ff',
+  label:   'LFO 1',
 });
 
 // Connect
@@ -158,14 +162,6 @@ lfocomp/
 ```
 
 The three files are fully independent of each other except in one direction: `lfo-ui.js` imports from `lfo-engine.js`, and `lfo-comp.js` imports from both. Nothing imports from the outside.
-
----
-
-## Roadmap
-
-- [ ] BPM sync — tempo-locked rates as note divisions (1/4, 1/8T, etc.)
-- [ ] Preset save/load — serialize the full route graph to JSON and restore it
-- [ ] Touch depth drag — dedicated touch target on ModIndicator for mobile
 
 ---
 
