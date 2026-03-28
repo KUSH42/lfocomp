@@ -3,7 +3,6 @@
 **Drop an LFO onto any HTML input. Done.**
 
 ![lfocomp demo](docs/demo.gif)
-<!-- Replace with an actual screen recording. ffmpeg -i demo.mp4 -vf "fps=30,scale=800:-1" demo.gif -->
 
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![zero dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
