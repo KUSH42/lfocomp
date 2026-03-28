@@ -553,27 +553,53 @@ export class ModIndicator {
       canvas.style.height = '5px';
     }
 
-    const meta = engine.getElementMeta(this._element);
-    const route = engine.getRoute(this._routeId);
-    if (!meta || !route) return;
+    const route  = engine.getRoute(this._routeId);
+    if (!route) return;
+    const lfoVal = engine.getValue(this._lfoId);
+    const depth  = route.depth;
 
-    const range = meta.max - meta.min;
-    if (range === 0) return;
+    let centerNorm, swingNorm, curNorm;
 
-    const baseNorm = (meta.baseValue - meta.min) / range;
-    const lfoVal   = engine.getValue(this._lfoId);
-    const depth    = route.depth;
-    const swingNorm = depth * 0.5; // half-range of swing in normalized units
+    if (route.targetType === 'lfo') {
+      // Chain route — synthesize arc params from target LFO state.
+      const tgt = engine.getLFO(route.target);
+      if (!tgt) return;
+      if (route.targetParam === 'rate') {
+        const min = 0.01, max = 20, range = max - min;
+        const base = tgt.baseRate;
+        centerNorm = (base - min) / range;
+        // Rate mod is multiplicative: effectiveRate = base × (1 + src × depth).
+        // Swing expressed in normalised units.
+        swingNorm  = (base * depth) / range;
+        curNorm    = Math.max(0, Math.min(1, (base * (1 + lfoVal * depth) - min) / range));
+      } else if (route.targetParam === 'depth') {
+        const base = tgt.baseDepth;
+        centerNorm = base;
+        swingNorm  = depth * 0.5;
+        curNorm    = Math.max(0, Math.min(1, base + lfoVal * depth * 0.5));
+      } else {
+        return;
+      }
+    } else {
+      // Element route — use registered element metadata.
+      const meta = engine.getElementMeta(this._element);
+      if (!meta) return;
+      const range = meta.max - meta.min;
+      if (range === 0) return;
+      centerNorm = (meta.baseValue - meta.min) / range;
+      swingNorm  = depth * 0.5;
+      curNorm    = Math.max(0, Math.min(1, (meta.baseValue + lfoVal * depth * range * 0.5 - meta.min) / range));
+    }
 
     const w = canvas.width;
     const h = canvas.height;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, w, h);
 
-    // Draw range bar
-    const xCenter = baseNorm * w;
-    const xMin    = Math.max(0, (baseNorm - swingNorm) * w);
-    const xMax    = Math.min(w, (baseNorm + swingNorm) * w);
+    // Draw sweep range bar
+    const xCenter = centerNorm * w;
+    const xMin    = Math.max(0, (centerNorm - swingNorm) * w);
+    const xMax    = Math.min(w, (centerNorm + swingNorm) * w);
 
     ctx.fillStyle = `${this._color}30`;
     ctx.fillRect(xMin, 1, xMax - xMin, h - 2);
@@ -582,8 +608,7 @@ export class ModIndicator {
     ctx.fillStyle = `${this._color}80`;
     ctx.fillRect(xCenter - 0.5, 0, 1, h);
 
-    // Draw current value indicator
-    const curNorm = Math.max(0, Math.min(1, (meta.baseValue + lfoVal * depth * range * 0.5 - meta.min) / range));
+    // Draw current position dot
     ctx.fillStyle = this._color;
     ctx.beginPath();
     ctx.arc(curNorm * w, h / 2, 2.5, 0, Math.PI * 2);
@@ -632,6 +657,7 @@ export class LFOWidget {
       if (id === this._lfoId) {
         this._recordSample(value);
         this._updateLed(value);
+        this._syncChainedSliders();
       }
     });
     this._rafHandle = null;
@@ -785,6 +811,27 @@ export class LFOWidget {
   // putImageData, so only intShift columns are repainted.  Cursor + dot at
   // the right edge (px = W-1) — always the most-recent sample.
 
+  /**
+   * Reflect effective (post-chain-modulation) rate and depth onto the param
+   * sliders so they visually track the modulated position.  Only touches the
+   * DOM when the effective value actually differs from the displayed value to
+   * avoid unnecessary repaints.
+   */
+  _syncChainedSliders() {
+    const lfo = engine.getLFO(this._lfoId);
+    if (!lfo) return;
+    const pairs = [
+      [this._rateInput,  lfo.rate],
+      [this._depthInput, lfo.depth],
+    ];
+    for (const [input, eff] of pairs) {
+      if (Math.abs(parseFloat(input.value) - eff) > 1e-6) {
+        input.value = eff;
+        input.dispatchEvent(new Event('lfo-update'));
+      }
+    }
+  }
+
   _recordSample(currentValue) {
     this._latestValue = currentValue;
     const canvas = this._canvas;
@@ -800,7 +847,7 @@ export class LFOWidget {
       buf.width      = W;
       buf.height     = H;
       this._wfBuf    = buf;
-      this._wfBufCtx = buf.getContext('2d');
+      this._wfBufCtx = buf.getContext('2d', { willReadFrequently: true });
       this._wfHistory   = new Float32Array(W).fill(currentValue);
       this._wfSubpx     = 0;
       this._wfLastTime  = now;
