@@ -1,0 +1,24 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Push to KUSH42.github.io
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          git clone --depth=1 https://x-access-token:${GH_PAT}@github.com/KUSH42/KUSH42.github.io.git _pages
+          cp demo.html _pages/lfo.html
+          cp lfo-engine.js lfo-ui.js lfo-comp.js _pages/
+          cd _pages
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add lfo.html lfo-engine.js lfo-ui.js lfo-comp.js
+          git diff --cached --quiet && echo "No changes" || git commit -m "sync lfocomp demo" && git push
