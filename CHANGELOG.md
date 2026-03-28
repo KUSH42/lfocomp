@@ -19,3 +19,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Float32Array ring buffer oscilloscope with fixed wall-clock time axis
 - Log-scaled rate slider (0.01 Hz – 10 Hz)
 - Zero runtime dependencies
+
+[Unreleased]: https://github.com/KUSH42/lfocomp/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/KUSH42/lfocomp/releases/tag/v0.1.0

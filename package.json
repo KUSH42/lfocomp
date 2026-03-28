@@ -30,7 +30,8 @@
     "lfo-engine.js",
     "lfo-ui.js",
     "lfo.js",
-    "types/"
+    "types/",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build:types":  "tsc -p tsconfig.json && tsc -p tsconfig.bundle.json",
