@@ -1,7 +1,7 @@
 # SPEC-npm-publish — npm publishing readiness
 
 ## Status
-Proposed
+Implemented — pending `npm publish`
 
 ## Goal
 

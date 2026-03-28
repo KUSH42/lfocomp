@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "declarationDir": "types",
+    "emitDeclarationOnly": true,
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "strict": false
+  },
+  "include": ["lfo.js"]
+}

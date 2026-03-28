@@ -3,3 +3,7 @@ node_modules/
 memory/
 temu-ableton-lfo.html
 CLAUDE.md
+
+# build artifacts
+lfo.js
+types/
